@@ -1,0 +1,24 @@
+resources:
+  pipelines:
+    country_pipeline:
+      name: country_pipeline
+      libraries:
+        # dims 
+        - notebook:
+            path: /Workspace/geo/files/silver_gold/dim_country
+        - notebook:
+            path: /Workspace/geo/files/silver_gold/dim_currency
+        - notebook:
+            path: /Workspace/geo/files/silver_gold/dim_language
+        # bridges
+        - notebook:
+            path: /Workspace/geo/files/silver_gold/bridge_country_currency
+        - notebook:
+            path: /Workspace/geo/files/silver_gold/bridge_country_language
+      schema: default
+      continuous: false
+      development: false
+      photon: true
+      channel: CURRENT
+      catalog: workspace
+      serverless: true

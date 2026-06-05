@@ -1,0 +1,28 @@
+# This is a Databricks asset bundle definition for geo.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: geo
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: production
+    workspace:
+      host: https://dbc-e3a3175f-3f6e.cloud.databricks.com
+      root_path: /Workspace/${bundle.target}_${bundle.name}
+
+  prod:
+    mode: production
+    default: true
+    workspace:
+      host: https://dbc-e3a3175f-3f6e.cloud.databricks.com
+      root_path: /Workspace/${bundle.name}
+    permissions:
+      - user_name: edwardapplication13@gmail.com
+        level: CAN_MANAGE
+
+variables:
+  warehouse_id: 
+    default: ec1416653d6d932f

@@ -1,0 +1,331 @@
+{
+  "datasets": [
+    {
+      "name": "01dd15f8",
+      "displayName": "Population",
+      "queryLines": [
+        "select \r\n",
+        "sum(Population) as `Global Population` \r\n",
+        "from dim_country"
+      ],
+      "catalog": "workspace",
+      "schema": "gold"
+    },
+    {
+      "name": "06cf2676",
+      "displayName": "Language",
+      "queryLines": [
+        "select count(distinct Name) as `Total Number of Languages` from dim_language"
+      ],
+      "catalog": "workspace",
+      "schema": "gold"
+    },
+    {
+      "name": "1629e945",
+      "displayName": "Top Languages",
+      "queryLines": [
+        "select \r\n",
+        "l.Name as `Language`\r\n",
+        ",count(c.Id) as `Countries`\r\n",
+        "from bridge_country_language b\r\n",
+        "join dim_country c on b.CountryId = c.Id\r\n",
+        "join dim_language l on b.LanguageId = l.Id\r\n",
+        "group by l.Name\r\n",
+        "order by count(c.Id) desc\r\n",
+        "limit 5"
+      ],
+      "catalog": "workspace",
+      "schema": "gold"
+    },
+    {
+      "name": "5a4608a1",
+      "displayName": "Top Currencies",
+      "queryLines": [
+        "select \r\n",
+        "d.Code as `Currencies`\r\n",
+        ",d.Name as `Currency Name`\r\n",
+        ",sum(c.Population) as `Population`\r\n",
+        "from bridge_country_currency b\r\n",
+        "join dim_country c on b.CountryId = c.Id\r\n",
+        "join dim_currency d on b.CurrencyId = d.Id\r\n",
+        "group by d.Code, d.Name\r\n",
+        "order by sum(c.Population) desc\r\n",
+        "limit 5"
+      ],
+      "catalog": "workspace",
+      "schema": "gold"
+    },
+    {
+      "name": "e41c4e63",
+      "displayName": "Currency",
+      "queryLines": [
+        "select count(distinct Code) as `Total Number of Currencies` from dim_currency"
+      ],
+      "catalog": "workspace",
+      "schema": "gold"
+    }
+  ],
+  "pages": [
+    {
+      "name": "b90f0f4f",
+      "displayName": "Summary",
+      "layout": [
+        {
+          "widget": {
+            "name": "glo",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "01dd15f8",
+                  "fields": [
+                    {
+                      "name": "sum(Global Population)",
+                      "expression": "SUM(`Global Population`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Global Population"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Global Population)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "number-of-langa",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "06cf2676",
+                  "fields": [
+                    {
+                      "name": "sum(Total Number of Languages)",
+                      "expression": "SUM(`Total Number of Languages`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Languages"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Total Number of Languages)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "top",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1629e945",
+                  "fields": [
+                    {
+                      "name": "Countries",
+                      "expression": "`Countries`"
+                    },
+                    {
+                      "name": "Language",
+                      "expression": "`Language`"
+                    },
+                    {
+                      "name": "sum(Countries)",
+                      "expression": "SUM(`Countries`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Top 5 spoken languages"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Language",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(Countries)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true,
+                  "text": {
+                    "fieldName": "Countries",
+                    "format": {
+                      "type": "number-plain",
+                      "abbreviation": "compact",
+                      "decimalPlaces": {
+                        "type": "max",
+                        "places": 2
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "top-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "5a4608a1",
+                  "fields": [
+                    {
+                      "name": "sum(Population)",
+                      "expression": "SUM(`Population`)"
+                    },
+                    {
+                      "name": "Currency Name",
+                      "expression": "`Currency Name`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Top 5 Currencies by Population"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(Population)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Currency Name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": false
+                },
+                "extra": [
+                  {
+                    "fieldName": "sum(Population)"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "number-of-currencies",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e41c4e63",
+                  "fields": [
+                    {
+                      "name": "sum(Total Number of Currencies)",
+                      "expression": "SUM(`Total Number of Currencies`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Currencies"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Total Number of Currencies)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 2,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
