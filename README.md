@@ -24,4 +24,4 @@ databricks bundle deploy -p geo
 ### 5. Run pipeline
 Trigger the `geo_pipeline` under the `Jobs & Pipelines` tab in the databricks main page.
 ### 6. View Dashboard
-Once the pipeline is finished running you will be able to view the "Geo Summary" under the `Dashboards` tab.
+Once the pipeline is finished running you will be able to view `Geo Summary` under the `Dashboards` tab.
