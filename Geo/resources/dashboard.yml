@@ -1,6 +1,6 @@
 resources:
   dashboards:
     my_dashboard:
-      display_name: "Countries Details"
+      display_name: "Geo Summary"
       file_path: ../dashboards/Countries_Details.lvdash
       warehouse_id: ${var.warehouse_id}

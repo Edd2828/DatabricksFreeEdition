@@ -1,7 +1,7 @@
 resources:
   pipelines:
-    country_pipeline:
-      name: country_pipeline
+    geo_pipeline:
+      name: geo_pipeline
       libraries:
         # dims 
         - notebook:
