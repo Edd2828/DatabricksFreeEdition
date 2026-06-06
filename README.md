@@ -7,9 +7,10 @@ This demo creates a pipeline and dashboard in databricks via the databricks cli.
 
 ### 1. login if profile is not created
 ```cmd
-databricks auth login --host "https://{workspace}.cloud.databricks.com" -p [profile]
+databricks auth login --host "https://{workspace}.cloud.databricks.com"
 ```
-### 2. check profile is created
+You will be prompted to provide a [profile]
+### 2. check profile is created and is Valid
 ```cmd 
 databricks auth profiles
 ```
@@ -19,7 +20,7 @@ databricks bundle validate -p [profile]
 ```
 ### 4. deploy bundle
 ```cmd
-databricks bundle deploy -p geo
+databricks bundle deploy -p [profile]
 ```
 ### 5. Run pipeline
 Trigger the `geo_pipeline` under the `Jobs & Pipelines` tab in the databricks main page.
