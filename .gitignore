@@ -1,6 +1,6 @@
 .venv
 
 # library
-databricks_library/build
+databricks_library/src/databricks_library/__pycache__
 databricks_library/databricks_library.egg-info
-databricks_library/dist
+databricks_library/src/databricks_library.egg-info
