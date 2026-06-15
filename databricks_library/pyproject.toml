@@ -1,10 +1,3 @@
-[project]
-name = "databricks_library"
-version = "0.0.1"
-description = "A simple utility for databricks free edition"
-authors = [{name="Edd2828"}]
-dependencies = []
-
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools >= 61.0", "wheel"]
 build-backend = "setuptools.build_meta"

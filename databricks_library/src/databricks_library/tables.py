@@ -1,4 +1,5 @@
-from databricks_library._fixture import Fixture
+# from databricks_library._fixture import Fixture
+from ._fixture import Fixture
 
 
 class Table:
@@ -13,5 +14,6 @@ class Table:
 
         self.fully_qualified_table_name = f"{self.catalog}.{self.schema}.{self.name}"
 
-# my_table = Table("test_catalog", "silver", "test")
-# print(my_table.fully_qualified_table_name)
+if __name__ == "__main__":
+    my_table = Table("test_catalog", "silver", "test")
+    print(my_table.fully_qualified_table_name)

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "databricks"
+version = "0.0.1"
+authors = [
+  { name="Example Author", email="author@example.com" },
+]
+description = "A simple utility for databricks free edition"
+readme = "README.md"
+requires-python = ">=3.9"
