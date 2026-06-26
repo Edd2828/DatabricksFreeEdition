@@ -1,7 +1,6 @@
 # Databricks notebook source
 from pyspark import pipelines as dp
-from pyspark.sql.functions import monotonically_increasing_id, col
-from pyspark.sql.types import IntegerType
+from pyspark.sql.functions import monotonically_increasing_id, upper
 
 
 @dp.table(
@@ -9,15 +8,13 @@ from pyspark.sql.types import IntegerType
 )
 def silver():
     df = (
-        spark.read.table("workspace.default.raw_countries")
-        .withColumn("Country", col("name").getField("common"))
-        .withColumn("Population", col("population").cast(IntegerType()))
-    ).sort("Country")
+        spark.read.table("workspace.bronze.raw_countries").sort("common_name")
+    )
 
     df = df.select(
         monotonically_increasing_id().alias("Id"),
-        df.Country.alias("Name"),
-        df.Population
+        upper(df.common_name).alias("Name"),
+        df.population.alias("Population")
     )
 
     return df

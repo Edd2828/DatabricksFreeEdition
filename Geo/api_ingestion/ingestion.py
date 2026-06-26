@@ -1,30 +1,28 @@
 # Databricks notebook source
-import requests
-
-from pyspark.sql.functions import current_timestamp
-from pyspark.sql.types import StructType, StructField, StringType, MapType
+from pyspark.sql.functions import explode, col, row_number
+from pyspark.sql.window import Window
 
 
-BASE_URL = "https://restcountries.com/v3.1/all?"
-params = {"fields": ["name", "population", "currencies", "languages"]}
+df = (
+    spark.read.format("json")
+    .load("/Volumes/workspace/default/rest_countries/*.json")
+).withColumn("_file_modified_time", col("_metadata.file_modification_time"))
 
-data = requests.get(BASE_URL, params=params).json()
+df = df.select(
+    explode(df.data.objects).alias("raw_objects"),
+    col("_file_modified_time"),
+)
 
-schema = StructType([
-    StructField("name", StructType([
-        StructField("common", StringType(), True),
-        StructField("official", StringType(), True),
-    ]), True),
-    StructField("currencies", MapType(
-        StringType(),
-        StructType([
-            StructField("name", StringType(), True),
-            StructField("symbol", StringType(), True),
-        ])), True),
-    StructField("languages", MapType(StringType(), StringType()), True),
-    StructField("population", StringType(), True),
-])
+df = df.select(
+    df.raw_objects.names.common.alias("common_name"),
+    df.raw_objects.currencies.alias("currencies"),
+    df.raw_objects.languages.alias("languages"),
+    df.raw_objects.population.alias("population"),
+    col("_file_modified_time"),
+)
 
-df = spark.createDataFrame(data, schema=schema).withColumn("IngestionDate", current_timestamp())
+window = Window.partitionBy("common_name").orderBy(col("_file_modified_time").desc())
 
-df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("raw_countries")
+df = df.withColumn("rownum", row_number().over(window)).filter(col("rownum") == 1).drop("rownum")
+
+df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("workspace.bronze.raw_countries")

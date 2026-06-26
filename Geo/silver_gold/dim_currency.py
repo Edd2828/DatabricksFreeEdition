@@ -1,21 +1,21 @@
 # Databricks notebook source
 from pyspark import pipelines as dp
-from pyspark.sql.functions import monotonically_increasing_id, col, explode
+from pyspark.sql.functions import monotonically_increasing_id, col, explode, upper, trim
 
 
 @dp.table(
     name=f"workspace.silver.dim_currency"
 )
 def silver():
-    df = spark.read.table("workspace.default.raw_countries")
+    df = spark.read.table("workspace.bronze.raw_countries")
 
-    df = df.select(explode(col("currencies"))).distinct().sort(col("key"))
+    df = df.select(explode(col("currencies")).alias("currencies")).distinct()
 
     df = df.select(
         monotonically_increasing_id().alias("Id"),
-        col("key").alias("Code"),
-        col("value.name").alias("Name"),
-    )
+        upper(df.currencies.getField("code")).alias("Code"),
+        upper(df.currencies.getField("name")).alias("Name"),
+    ).filter(trim(col("Code")) != "")
 
     return df
 
