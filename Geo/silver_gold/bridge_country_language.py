@@ -1,20 +1,20 @@
 # Databricks notebook source
 from pyspark import pipelines as dp
-from pyspark.sql.functions import col, explode
+from pyspark.sql.functions import col, explode, upper, trim
 
 
 @dp.table(
     name=f"workspace.silver.bridge_country_language"
 )
 def silver():
-    df = spark.read.table("workspace.default.raw_countries").withColumn("Country", col("name").getField("common"))
+    df = spark.read.table("workspace.bronze.raw_countries")
 
-    df = df.select(col("Country"), explode(col("languages"))).distinct().sort(col("Country"), col("key"))
+    df = df.select(col("common_name"), explode(col("languages")).alias("languages")).distinct()
 
     df = df.select(
-        col("Country"),
-        col("key").alias("LanguageCode"),
-    )
+        upper(df.common_name).alias("Country"),
+        upper(df.languages.getField("iso639_3")).alias("LanguageCode"),
+    ).sort(col("Country"), col("LanguageCode")).filter(trim(col("LanguageCode")) != "")
 
     return df
 
