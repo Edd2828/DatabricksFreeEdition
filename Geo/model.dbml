@@ -1,0 +1,65 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table bridge_country_currency {
+  CountryId bigint [not null]
+  CurrencyId bigint [not null]
+}
+
+Table bridge_country_language {
+  CountryId bigint [not null]
+  LanguageId bigint [not null]
+}
+
+Table dim_country {
+  Id bigint [primary key]
+  Name string
+  Population bigint
+}
+
+Table dim_currency {
+  Id bigint [primary key]
+  Code string
+  Name string
+}
+
+Table dim_language {
+  Id bigint [primary key]
+  Code string
+  Name string
+}
+
+Ref country_currency: bridge_country_currency.CountryId > dim_country.Id // many-to-one
+
+Ref country_currency: bridge_country_currency.CurrencyId > dim_currency.Id // many-to-one
+
+Ref country_language: bridge_country_language.CountryId > dim_country.Id // many-to-one
+
+Ref country_language: bridge_country_language.LanguageId > dim_language.Id // many-to-one
+
+Records dim_country(Id, Name, Population) {
+  0,	'ABKHAZIA', 244000
+  1,	'AFGHANISTAN', 35000000
+  2,	'ALBANIA', 2402113
+  3,	'ALGERIA', 47400000
+  4,	'AMERICAN SAMOA', 43268
+  5,	'ANDORRA', 89368
+}
+
+Records dim_language(Id, Code, Name) {
+  0,	'MON',	'MONGOLIAN'
+  1,	'AFR',	'AFRIKAANS'
+  2,	'BUL',	'BULGARIAN'
+  3,	'POV',	'UPPER GUINEA CRIOULO'
+  4,	'OCI',	'ARANESE'
+  5,	'TPI',	'TOK PISIN'
+}
+
+Records dim_currency(Id, Code, Name) {
+  0,	'VUV',	'VANUATU VATU'
+  1,	'CUP',	'CUBAN PESO'
+  2,	'JEP',	'JERSEY POUND'
+  3,	'LYD',	'LIBYAN DINAR'
+  4,	'MOP',	'MACANESE PATACA'
+  5,	'AFN',	'AFGHAN AFGHANI'
+}
