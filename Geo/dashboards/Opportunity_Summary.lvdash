@@ -1,0 +1,449 @@
+{
+  "datasets": [
+    {
+      "name": "81e5ed8f",
+      "displayName": "Values",
+      "queryLines": [
+        "select\r\n",
+        "sum(Amount) as `Total Opportunities Value`,\r\n",
+        "sum(ExpectedRevenue) as `Total Opportunities Expected`,\r\n",
+        "count(1) as `Total Opportunities`,\r\n",
+        "sum(case when IsWon = true then 1 else 0 end) as `Total Won Opportunities`,\r\n",
+        "sum(case when IsWon = false then 1 else 0 end) as `Total Lost Opportunities`,\r\n",
+        "round(sum(case when IsWon = true then 1 else 0 end)/count(1) * 100) as `Win Rate`\r\n",
+        "from salesforce.bronze.opportunity\r\n"
+      ]
+    },
+    {
+      "name": "2ab1ae81",
+      "displayName": "Top 10",
+      "queryLines": [
+        "select\r\n",
+        "Name as `Opportunity`,\r\n",
+        "Owner as `Owner`,\r\n",
+        "sum(Amount) as `Total Won`\r\n",
+        "from (\r\n",
+        "    select opp.Name, opp.Amount, concat_ws(' ', u.FirstName, u.LastName) as `Owner` from salesforce.bronze.opportunity opp\r\n",
+        "    left join salesforce.bronze.user u on opp.OwnerId = u.Id\r\n",
+        "    where opp.StageName = 'Closed Won'\r\n",
+        ")\r\n",
+        "group by `Opportunity`, `Owner`\r\n",
+        "order by `Total Won` desc\r\n",
+        "limit 10\r\n"
+      ]
+    },
+    {
+      "name": "b5a05a27",
+      "displayName": "Salesforce Opportunity Data Snapshot",
+      "queryLines": [
+        "select\r\n",
+        "Id,\r\n",
+        "cast(CreatedDate as date) as `CreatedDate`\r\n",
+        "from salesforce.bronze.opportunity"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "ce56ef45",
+      "displayName": "Summary",
+      "layout": [
+        {
+          "widget": {
+            "name": "o",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "b5a05a27",
+                  "fields": [
+                    {
+                      "name": "monthly(CreatedDate)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `CreatedDate`)"
+                    },
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Created by Date"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(CreatedDate)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(*)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tot",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "81e5ed8f",
+                  "fields": [
+                    {
+                      "name": "Total Opportunities Expected",
+                      "expression": "`Total Opportunities Expected`"
+                    },
+                    {
+                      "name": "Total Opportunities Value",
+                      "expression": "`Total Opportunities Value`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Value",
+                "showDescription": true,
+                "description": "Expected Value"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Total Opportunities Value"
+                },
+                "target": {
+                  "fieldName": "Total Opportunities Expected"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "num",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "81e5ed8f",
+                  "fields": [
+                    {
+                      "name": "sum(Total Won Opportunities)",
+                      "expression": "SUM(`Total Won Opportunities`)"
+                    },
+                    {
+                      "name": "sum(Total Opportunities)",
+                      "expression": "SUM(`Total Opportunities`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Total",
+                "description": "Won"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Total Opportunities)"
+                },
+                "target": {
+                  "fieldName": "sum(Total Won Opportunities)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "top-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2ab1ae81",
+                  "fields": [
+                    {
+                      "name": "Owner",
+                      "expression": "`Owner`"
+                    },
+                    {
+                      "name": "Total Won",
+                      "expression": "`Total Won`"
+                    },
+                    {
+                      "name": "Opportunity",
+                      "expression": "`Opportunity`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`Owner` IN (`Owner`) OR TRUE"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Top 10",
+                "showDescription": true,
+                "description": "by Owner"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Total Won",
+                  "axis": {
+                    "hideTitle": true,
+                    "hideLabels": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Opportunity",
+                  "axis": {
+                    "hideTitle": true,
+                    "hideLabels": false
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "color": {
+                  "fieldName": "Owner",
+                  "legend": {
+                    "hide": false,
+                    "hideTitle": true,
+                    "position": "right"
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "win",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "81e5ed8f",
+                  "fields": [
+                    {
+                      "name": "sum(Win Rate)",
+                      "expression": "SUM(`Win Rate`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Win Rate",
+                "showDescription": true,
+                "description": "as %"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Win Rate)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "opportun",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "81e5ed8f",
+                  "fields": [
+                    {
+                      "name": "sum(Total Lost Opportunities)",
+                      "expression": "SUM(`Total Lost Opportunities`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Lost"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Total Lost Opportunities)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
